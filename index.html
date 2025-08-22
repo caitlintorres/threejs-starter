@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Three.js Starter – Spinning Cube</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html, body { height: 100%; margin: 0; background: #0e0e10; }
+      canvas { display: block; }
+      #overlay {
+        position: fixed; top: 12px; left: 12px;
+        background: rgba(0,0,0,.35); color: #cfd3dc;
+        font: 14px/1.4 system-ui, sans-serif; padding: 8px 10px; border-radius: 8px;
+        backdrop-filter: blur(4px);
+      }
+    </style>
+
+    <!-- ✅ Import map: tells the browser what 'three' maps to -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <div id="overlay">🧊 Drag to orbit • Wheel = zoom • Right-drag = pan</div>
+
+    <script type="module">
+      // Now we can use bare specifiers thanks to the import map above
+      import * as THREE from "three";
+      import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js";
+
+      // Renderer
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      document.body.appendChild(renderer.domElement);
+
+      // Scene & Camera
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0e0e10);
+
+      const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+      camera.position.set(2.5, 2, 3);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+
+      // Lights
+      scene.add(new THREE.AmbientLight(0xffffff, 0.1));
+      const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+      dirLight.position.set(3, 4, 2);
+      scene.add(dirLight);
+
+      // ✅ Add a helper so you can *see* the light direction
+      const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 1, 0xff0000);
+      scene.add(dirLightHelper);
+
+      //orange = X, green = Y, blue = Z
+      const axesHelper = new THREE.AxesHelper(3); // size = 3
+      scene.add(axesHelper);
+
+      // Cube
+      const cube = new THREE.Mesh(
+        new THREE.BoxGeometry(),
+        new THREE.MeshStandardMaterial({ color: 0x00ffff })
+      );
+      scene.add(cube);
+
+      // Resize
+      function resize() {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+      }
+      window.addEventListener("resize", resize);
+      resize();
+
+      // Animate
+      function animate() {
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.02;
+        controls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+      animate();
+    </script>
+  </body>
+</html>
